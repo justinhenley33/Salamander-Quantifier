@@ -1,12 +1,77 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Salamander Quantifier</title>
-  </head>
-  <body>
-    <h1>Hello World 🦎</h1>
-    <p>If you can see this, GitHub Pages is working.</p>
-  </body>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Salamander Quantifier</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">Salamander Quantifier</div>
+    <nav class="nav">
+      <a href="#" class="navlink">Upload</a>
+      <a href="#" class="navlink">Export</a>
+      <a href="#" class="navlink">Help</a>
+    </nav>
+  </header>
+
+  <main class="layout">
+    <aside class="sidebar">
+      <h2>TOOLS</h2>
+
+      <div class="block">
+        <label class="btn">
+          Upload Image
+          <input id="fileInput" type="file" accept="image/*" hidden />
+        </label>
+        <div id="fileName" class="hint">No file selected</div>
+      </div>
+
+      <div class="block">
+        <h3>Manual Segmentation (Polygon)</h3>
+        <div class="hint">
+          Click to add points. Double-click to close polygon.
+        </div>
+
+        <div class="row">
+          <button id="undoBtn" class="btn2" disabled>Undo point</button>
+          <button id="clearBtn" class="btn2" disabled>Clear</button>
+        </div>
+
+        <label class="check">
+          <input id="showOverlay" type="checkbox" checked />
+          Show overlay
+        </label>
+      </div>
+
+      <div class="block">
+        <h3>Export</h3>
+        <div class="row">
+          <button id="exportJsonBtn" class="btn2" disabled>Polygon JSON</button>
+          <button id="exportMaskBtn" class="btn2" disabled>Mask PNG</button>
+        </div>
+        <div class="hint">
+          Mask is white = selected region, black = background.
+        </div>
+      </div>
+
+      <div class="block">
+        <h3>Status</h3>
+        <div id="status" class="status">Upload an image to begin.</div>
+      </div>
+    </aside>
+
+    <section class="viewer">
+      <div class="canvasWrap">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div class="footerHint">
+        Tip: after closing polygon, you can export JSON or a binary mask.
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
 </html>
