@@ -16,7 +16,7 @@ let imgScale = 1;
 let imgOffsetX = 0;
 let imgOffsetY = 0;
 
-// polygon points stored in IMAGE coordinates (not canvas coordinates)
+// polygon points stored in IMAGE coordinates 
 let points = [];
 let polygonClosed = false;
 
