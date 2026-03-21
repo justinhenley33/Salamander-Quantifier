@@ -82,19 +82,10 @@ export function exportColorCsv() {
     return;
   }
 
-  const imageName = getSafeImageFilename();
-  const imageSize =
-    state.imageSizeText || `${state.img.width}x${state.img.height}`;
-
   const baseName = getBaseImageName();
 
+  // Detailed CSV
   const detailedLines = [];
-
-  detailedLines.push(
-    `${imageName} ${imageSize} Regional Color Analysis Detailed View`
-  );
-  detailedLines.push("");
-
   detailedLines.push("hex_value,pixel_count");
 
   for (const row of state.colorHexCounts) {
@@ -105,16 +96,9 @@ export function exportColorCsv() {
 
   const detailedCsv = detailedLines.join("\n");
 
+  // Overview CSV
   const overviewLines = [];
-
-  overviewLines.push(
-    `${imageName} ${imageSize} Regional Color Analysis Overview`
-  );
-  overviewLines.push("");
-
-  overviewLines.push(
-    "general_color,range_label,pixel_count,percent_of_area"
-  );
+  overviewLines.push("general_color,range_label,pixel_count,percent_of_area");
 
   for (const row of state.colorOverviewRows) {
     overviewLines.push(
@@ -145,6 +129,7 @@ export function exportColorCsv() {
 
   setStatus("Exported detailed and overview color CSV files.");
 }
+
 export function exportColorBinnedCsv() {
   if (!state.colorAnalysisComplete || state.colorBinnedCounts.length === 0) {
     setStatus("Run color analysis before exporting binned CSV.");
@@ -156,23 +141,11 @@ export function exportColorBinnedCsv() {
     state.fileInput?.files?.[0]?.name ||
     "uploaded_image";
 
-  const imageSize =
-    state.imageSizeText || `${state.img.width}x${state.img.height}`;
-
   const baseName = imageName.replace(/\.[^.]+$/, "");
 
   const lines = [];
-
-  // Title row
-  lines.push(
-    `${imageName} ${imageSize} Regional Color Analysis (Binned Size 32)`
-  );
-  lines.push("");
-
-  // Header
   lines.push("binned_hex_value,pixel_count");
 
-  // Data
   for (const row of state.colorBinnedCounts) {
     lines.push(`${row.hexValue},${row.pixelCount}`);
   }
