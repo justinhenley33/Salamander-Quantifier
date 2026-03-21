@@ -24,6 +24,12 @@ export const state = {
 
   colorAnalysisMode: false,
   colorAnalysisComplete: false,
-  colorAnalysisResults: [],
-  colorAnalysisSummary: null
+  
+  // detailed
+  colorHexCounts: [],
+  totalPixelsInSelection: 0,
+
+  // overview
+  colorBinnedCounts: [],
+  colorOverviewRows: []
 };

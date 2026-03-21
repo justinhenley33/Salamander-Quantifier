@@ -1,39 +1,6 @@
 import { state } from "./state.js";
 import { draw } from "./canvas.js";
-import { enableTools, setStatus } from "./utils.js";
-
-const NAMED_COLORS = [
-  { name: "Black", hex: "#000000" },
-  { name: "White", hex: "#FFFFFF" },
-  { name: "Red", hex: "#FF0000" },
-  { name: "Lime", hex: "#00FF00" },
-  { name: "Blue", hex: "#0000FF" },
-  { name: "Yellow", hex: "#FFFF00" },
-  { name: "Cyan", hex: "#00FFFF" },
-  { name: "Magenta", hex: "#FF00FF" },
-  { name: "Silver", hex: "#C0C0C0" },
-  { name: "Gray", hex: "#808080" },
-  { name: "Maroon", hex: "#800000" },
-  { name: "Olive", hex: "#808000" },
-  { name: "Green", hex: "#008000" },
-  { name: "Purple", hex: "#800080" },
-  { name: "Teal", hex: "#008080" },
-  { name: "Navy", hex: "#000080" },
-  { name: "Orange", hex: "#FFA500" },
-  { name: "Brown", hex: "#A52A2A" },
-  { name: "Pink", hex: "#FFC0CB" },
-  { name: "Salmon", hex: "#FA8072" },
-  { name: "Coral", hex: "#FF7F50" },
-  { name: "Gold", hex: "#FFD700" },
-  { name: "Khaki", hex: "#F0E68C" },
-  { name: "Tan", hex: "#D2B48C" },
-  { name: "Beige", hex: "#F5F5DC" },
-  { name: "Ivory", hex: "#FFFFF0" },
-  { name: "Lavender", hex: "#E6E6FA" },
-  { name: "Violet", hex: "#EE82EE" },
-  { name: "Indigo", hex: "#4B0082" },
-  { name: "Turquoise", hex: "#40E0D0" }
-];
+import { setStatus } from "./utils.js";
 
 function componentToHex(v) {
   return v.toString(16).padStart(2, "0").toUpperCase();
@@ -43,39 +10,70 @@ function rgbToHex(r, g, b) {
   return `#${componentToHex(r)}${componentToHex(g)}${componentToHex(b)}`;
 }
 
-function hexToRgb(hex) {
-  const clean = hex.replace("#", "");
-  return {
-    r: parseInt(clean.slice(0, 2), 16),
-    g: parseInt(clean.slice(2, 4), 16),
-    b: parseInt(clean.slice(4, 6), 16)
-  };
+function rgbToHsv(r, g, b) {
+  const rn = r / 255;
+  const gn = g / 255;
+  const bn = b / 255;
+
+  const max = Math.max(rn, gn, bn);
+  const min = Math.min(rn, gn, bn);
+  const delta = max - min;
+
+  let h = 0;
+  if (delta !== 0) {
+    if (max === rn) h = 60 * (((gn - bn) / delta) % 6);
+    else if (max === gn) h = 60 * (((bn - rn) / delta) + 2);
+    else h = 60 * (((rn - gn) / delta) + 4);
+  }
+  if (h < 0) h += 360;
+
+  const s = max === 0 ? 0 : delta / max;
+  const v = max;
+
+  return { h, s, v };
 }
 
-function colorDistanceSq(a, b) {
-  const dr = a.r - b.r;
-  const dg = a.g - b.g;
-  const db = a.b - b.b;
-  return dr * dr + dg * dg + db * db;
-}
+function classifyColorFamily(r, g, b) {
+  const { h, s, v } = rgbToHsv(r, g, b);
 
-function getClosestColorName(hex) {
-  const rgb = hexToRgb(hex);
-
-  let best = NAMED_COLORS[0];
-  let bestDist = Infinity;
-
-  for (const candidate of NAMED_COLORS) {
-    const candRgb = hexToRgb(candidate.hex);
-    const dist = colorDistanceSq(rgb, candRgb);
-
-    if (dist < bestDist) {
-      bestDist = dist;
-      best = candidate;
-    }
+  if (v >= 0.94 && s <= 0.08) {
+    return { color: "White", range: "#F0F0F0–#FFFFFF" };
   }
 
-  return best.name;
+  if (v <= 0.18) {
+    return { color: "Black", range: "#000000–#2E2E2E" };
+  }
+
+  if (s <= 0.15) {
+    return { color: "Gray", range: "#2F2F2F–#EFEFEF" };
+  }
+
+  if (h >= 15 && h < 45 && v < 0.65) {
+    return { color: "Brown", range: "dark orange-brown family" };
+  }
+
+  if (h >= 345 || h < 15) {
+    return { color: "Red", range: "red family" };
+  }
+  if (h >= 15 && h < 45) {
+    return { color: "Orange", range: "orange family" };
+  }
+  if (h >= 45 && h < 70) {
+    return { color: "Yellow", range: "yellow family" };
+  }
+  if (h >= 70 && h < 170) {
+    return { color: "Green", range: "green family" };
+  }
+  if (h >= 170 && h < 200) {
+    return { color: "Cyan", range: "cyan family" };
+  }
+  if (h >= 200 && h < 255) {
+    return { color: "Blue", range: "blue family" };
+  }
+  if (h >= 255 && h < 320) {
+    return { color: "Purple", range: "purple family" };
+  }
+  return { color: "Pink", range: "pink family" };
 }
 
 function buildPolygonMaskCanvas() {
@@ -84,17 +82,14 @@ function buildPolygonMaskCanvas() {
   off.height = state.img.height;
   const octx = off.getContext("2d");
 
-  octx.clearRect(0, 0, off.width, off.height);
   octx.fillStyle = "black";
   octx.fillRect(0, 0, off.width, off.height);
 
   octx.beginPath();
   octx.moveTo(state.points[0].x, state.points[0].y);
-
   for (let i = 1; i < state.points.length; i++) {
     octx.lineTo(state.points[i].x, state.points[i].y);
   }
-
   octx.closePath();
   octx.fillStyle = "white";
   octx.fill();
@@ -102,8 +97,20 @@ function buildPolygonMaskCanvas() {
   return off;
 }
 
-function getTimestampIso() {
-  return new Date().toISOString();
+function getSafeImageFilename() {
+  return (
+    state.imageFilename ||
+    state.fileInput?.files?.[0]?.name ||
+    "uploaded_image"
+  );
+}
+
+function binColor(r, g, b, binSize = 32) {
+  return {
+    r: Math.floor(r / binSize) * binSize,
+    g: Math.floor(g / binSize) * binSize,
+    b: Math.floor(b / binSize) * binSize
+  };
 }
 
 export function runColorAnalysis() {
@@ -116,10 +123,11 @@ export function runColorAnalysis() {
 
   state.colorAnalysisMode = true;
   state.colorAnalysisComplete = false;
-  state.colorAnalysisResults = [];
-  state.colorAnalysisSummary = null;
-  draw();
+  state.colorHexCounts = [];
+  state.colorOverviewRows = [];
+  state.totalPixelsInSelection = 0;
 
+  draw();
   setStatus("Running color analysis...");
 
   const imageCanvas = document.createElement("canvas");
@@ -134,55 +142,75 @@ export function runColorAnalysis() {
   const maskCtx = maskCanvas.getContext("2d");
   const maskData = maskCtx.getImageData(0, 0, maskCanvas.width, maskCanvas.height).data;
 
-  const counts = new Map();
-  let totalPixelsInSelection = 0;
+  const hexCounts = new Map();
+  const overviewMap = new Map();
+  const binnedCounts = new Map();
+  let totalPixels = 0;
 
   for (let i = 0; i < imageData.length; i += 4) {
     const maskR = maskData[i];
     const alpha = imageData[i + 3];
+    if (maskR !== 255 || alpha === 0) continue;
 
-    if (maskR === 255 && alpha > 0) {
-      const r = imageData[i];
-      const g = imageData[i + 1];
-      const b = imageData[i + 2];
+    const r = imageData[i];
+    const g = imageData[i + 1];
+    const b = imageData[i + 2];
+    const hex = rgbToHex(r, g, b);
 
-      const hex = rgbToHex(r, g, b);
-      counts.set(hex, (counts.get(hex) || 0) + 1);
-      totalPixelsInSelection += 1;
-    }
+    const binned = binColor(r, g, b, 32);
+    const binnedHex = rgbToHex(binned.r, binned.g, binned.b);
+
+    binnedCounts.set(binnedHex, (binnedCounts.get(binnedHex) || 0) + 1);
+
+    hexCounts.set(hex, (hexCounts.get(hex) || 0) + 1);
+    totalPixels += 1;
+
+    const family = classifyColorFamily(r, g, b);
+    const key = `${family.color}||${family.range}`;
+    overviewMap.set(key, (overviewMap.get(key) || 0) + 1);
   }
 
-  const timestamp = getTimestampIso();
-  const photoSize = `${state.img.width}x${state.img.height}`;
+  const filename = getSafeImageFilename();
 
-  const rows = Array.from(counts.entries())
-    .map(([hex, pixelCount]) => ({
-      filename: state.imageFilename || "unknown",
-      colorCommonName: getClosestColorName(hex),
-      hexValue: hex,
-      pixelCountWithinRegion: pixelCount,
-      totalPixelsInSelection,
-      percentThisColorInArea:
-        totalPixelsInSelection > 0 ? pixelCount / totalPixelsInSelection : 0,
-      photoSize,
-      timestamp
+  state.imageFilename = filename;
+  state.totalPixelsInSelection = totalPixels;
+  state.colorBinnedCounts = Array.from(binnedCounts.entries())
+  .map(([hexValue, pixelCount]) => ({
+    hexValue,
+    pixelCount
+  }))
+  .sort((a, b) => b.pixelCount - a.pixelCount);
+
+  state.colorHexCounts = Array.from(hexCounts.entries())
+    .map(([hexValue, pixelCount]) => ({
+      filename,
+      hexValue,
+      pixelCount
     }))
-    .sort((a, b) => b.pixelCountWithinRegion - a.pixelCountWithinRegion)
-    .slice(0, 10);
+    .sort((a, b) => b.pixelCount - a.pixelCount);
 
-  state.colorAnalysisResults = rows;
-  state.colorAnalysisSummary = {
-    totalPixelsInSelection,
-    uniqueHexCount: counts.size,
-    analyzedAt: timestamp
-  };
+  state.colorOverviewRows = Array.from(overviewMap.entries())
+    .map(([key, pixelCount]) => {
+      const [generalColor, hexRange] = key.split("||");
+      return {
+        generalColor,
+        hexRange,
+        pixelCount,
+        percentage: totalPixels > 0 ? pixelCount / totalPixels : 0
+      };
+    })
+    .sort((a, b) => b.pixelCount - a.pixelCount);
+
   state.colorAnalysisComplete = true;
 
   if (state.exportColorCsvBtn) {
-    state.exportColorCsvBtn.disabled = rows.length === 0;
+    state.exportColorCsvBtn.disabled = false;
   }
 
-  enableTools(true);
+  if (state.exportColorBinnedBtn) {
+    state.exportColorBinnedBtn.disabled = false;
+  }
+
   draw();
-  setStatus("Color analysis complete. Export Color CSV when ready.");
+  setStatus("Color analysis complete. Export workbook when ready.");
 }

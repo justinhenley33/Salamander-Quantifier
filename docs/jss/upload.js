@@ -8,6 +8,7 @@ export function handleFileChange(e) {
   if (!file) return;
 
   state.fileName.textContent = file.name;
+  state.imageFilename = file.name;
   const url = URL.createObjectURL(file);
 
   const image = new Image();

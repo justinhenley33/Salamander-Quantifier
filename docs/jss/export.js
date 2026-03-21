@@ -52,6 +52,18 @@ export function exportMask() {
   setStatus("Exported mask.png (white region = selection).");
 }
 
+function getSafeImageFilename() {
+  return (
+    state.imageFilename ||
+    state.fileInput?.files?.[0]?.name ||
+    "uploaded_image"
+  );
+}
+
+function getBaseImageName() {
+  return getSafeImageFilename().replace(/\.[^.]+$/, "");
+}
+
 function csvEscape(value) {
   const str = String(value);
   if (str.includes(",") || str.includes('"') || str.includes("\n")) {
@@ -60,45 +72,118 @@ function csvEscape(value) {
   return str;
 }
 
+function formatPercent(p) {
+  return (p * 100).toFixed(4);
+}
+
 export function exportColorCsv() {
-  if (!state.colorAnalysisComplete || state.colorAnalysisResults.length === 0) {
-    setStatus("Run color analysis before exporting Color CSV.");
+  if (!state.colorAnalysisComplete || state.colorHexCounts.length === 0) {
+    setStatus("Run color analysis before exporting.");
     return;
   }
 
-  const headers = [
-    "filename",
-    "color common name",
-    "hex value",
-    "pixel count within region that had that hex color",
-    "total pixels in selection",
-    "% this color in area",
-    "photosize",
-    "timestamp"
-  ];
+  const imageName = getSafeImageFilename();
+  const imageSize =
+    state.imageSizeText || `${state.img.width}x${state.img.height}`;
 
-  const lines = [headers.map(csvEscape).join(",")];
+  const baseName = getBaseImageName();
 
-  for (const row of state.colorAnalysisResults) {
-    lines.push(
+  const detailedLines = [];
+
+  detailedLines.push(
+    `${imageName} ${imageSize} Regional Color Analysis Detailed View`
+  );
+  detailedLines.push("");
+
+  detailedLines.push("hex_value,pixel_count");
+
+  for (const row of state.colorHexCounts) {
+    detailedLines.push(
+      [row.hexValue, row.pixelCount].map(csvEscape).join(",")
+    );
+  }
+
+  const detailedCsv = detailedLines.join("\n");
+
+  const overviewLines = [];
+
+  overviewLines.push(
+    `${imageName} ${imageSize} Regional Color Analysis Overview`
+  );
+  overviewLines.push("");
+
+  overviewLines.push(
+    "general_color,range_label,pixel_count,percent_of_area"
+  );
+
+  for (const row of state.colorOverviewRows) {
+    overviewLines.push(
       [
-        row.filename,
-        row.colorCommonName,
-        row.hexValue,
-        row.pixelCountWithinRegion,
-        row.totalPixelsInSelection,
-        row.percentThisColorInArea,
-        row.photoSize,
-        row.timestamp
+        row.generalColor,
+        row.hexRange,
+        row.pixelCount,
+        formatPercent(row.percentage)
       ]
         .map(csvEscape)
         .join(",")
     );
   }
 
-  const csv = lines.join("\n");
-  const baseName = (state.imageFilename || "image").replace(/\.[^.]+$/, "");
-  downloadTextFile(`${baseName}_color_analysis.csv`, csv, "text/csv");
+  const overviewCsv = overviewLines.join("\n");
 
-  setStatus("Exported color analysis CSV.");
+  downloadTextFile(
+    `${baseName}_color_detailed.csv`,
+    detailedCsv,
+    "text/csv"
+  );
+
+  downloadTextFile(
+    `${baseName}_color_overview.csv`,
+    overviewCsv,
+    "text/csv"
+  );
+
+  setStatus("Exported detailed and overview color CSV files.");
+}
+export function exportColorBinnedCsv() {
+  if (!state.colorAnalysisComplete || state.colorBinnedCounts.length === 0) {
+    setStatus("Run color analysis before exporting binned CSV.");
+    return;
+  }
+
+  const imageName =
+    state.imageFilename ||
+    state.fileInput?.files?.[0]?.name ||
+    "uploaded_image";
+
+  const imageSize =
+    state.imageSizeText || `${state.img.width}x${state.img.height}`;
+
+  const baseName = imageName.replace(/\.[^.]+$/, "");
+
+  const lines = [];
+
+  // Title row
+  lines.push(
+    `${imageName} ${imageSize} Regional Color Analysis (Binned Size 32)`
+  );
+  lines.push("");
+
+  // Header
+  lines.push("binned_hex_value,pixel_count");
+
+  // Data
+  for (const row of state.colorBinnedCounts) {
+    lines.push(`${row.hexValue},${row.pixelCount}`);
+  }
+
+  const csv = lines.join("\n");
+
+  downloadTextFile(
+    `${baseName}_color_binned_32.csv`,
+    csv,
+    "text/csv"
+  );
+
+  setStatus("Exported binned color CSV (size 32).");
 }

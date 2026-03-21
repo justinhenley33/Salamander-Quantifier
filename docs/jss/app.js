@@ -7,7 +7,7 @@ import {
   undoPoint,
   clearPolygon
 } from "./segmentation.js";
-import { exportJson, exportMask, exportColorCsv } from "./export.js";
+import { exportJson, exportMask, exportColorCsv, exportColorBinnedCsv } from "./export.js";
 import { runColorAnalysis } from "./color.js";
 import { setStatus, enableTools } from "./utils.js";
 
@@ -41,6 +41,10 @@ export function initApp() {
   state.exportMaskBtn.addEventListener("click", exportMask);
   state.exportColorCsvBtn.addEventListener("click", exportColorCsv);
   state.colorAnalysisBtn.addEventListener("click", runColorAnalysis);
+  state.exportColorBinnedBtn = document.getElementById("exportColorBinnedBtn");
+
+  state.exportColorBinnedBtn.addEventListener("click", exportColorBinnedCsv);
+  state.exportColorBinnedBtn.disabled = true;
 
   state.exportColorCsvBtn.disabled = true;
 
