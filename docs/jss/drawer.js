@@ -4,22 +4,124 @@ function formatPercent(p) {
   return (p * 100).toFixed(2);
 }
 
+function getDrawerElements() {
+  return {
+    drawer: document.getElementById("bottomDrawer"),
+    content: document.getElementById("bottomDrawerContent"),
+    handle: document.getElementById("bottomDrawerHandle"),
+    tbody: document.getElementById("overviewPreviewBody"),
+    summary: document.getElementById("bottomDrawerSummary")
+  };
+}
+
+function setDrawerState(mode) {
+  const { drawer } = getDrawerElements();
+  if (!drawer) return;
+
+  drawer.classList.remove("open", "mid");
+  if (mode === "open") drawer.classList.add("open");
+  if (mode === "mid") drawer.classList.add("mid");
+}
+
+function snapDrawerByOffset(offsetY, contentHeight) {
+  // offsetY = current translateY in px
+  // smaller offset => more open
+  const closedY = contentHeight - 72;
+  const midY = contentHeight - 180;
+  const openY = 0;
+
+  const distances = [
+    { mode: "open", dist: Math.abs(offsetY - openY), y: openY },
+    { mode: "mid", dist: Math.abs(offsetY - midY), y: midY },
+    { mode: "closed", dist: Math.abs(offsetY - closedY), y: closedY }
+  ];
+
+  distances.sort((a, b) => a.dist - b.dist);
+  return distances[0].mode;
+}
+
 export function initBottomDrawer() {
-  state.bottomDrawer = document.getElementById("bottomDrawer");
-  state.bottomDrawerToggle = document.getElementById("bottomDrawerToggle");
-  state.bottomDrawerContent = document.getElementById("bottomDrawerContent");
+  const { drawer, content, handle } = getDrawerElements();
+  if (!drawer || !content || !handle) return;
 
-  if (!state.bottomDrawer || !state.bottomDrawerToggle) return;
+  let isDragging = false;
+  let startY = 0;
+  let startTranslateY = 0;
+  let currentTranslateY = 0;
 
-  state.bottomDrawerToggle.addEventListener("click", () => {
-    state.bottomDrawer.classList.toggle("open");
+  function getCurrentTranslateY() {
+    const style = window.getComputedStyle(content);
+    const transform = style.transform;
+
+    if (!transform || transform === "none") {
+      if (drawer.classList.contains("open")) return 0;
+      if (drawer.classList.contains("mid")) return content.offsetHeight - 180;
+      return content.offsetHeight - 72;
+    }
+
+    const matrix = new DOMMatrix(transform);
+    return matrix.m42;
+  }
+
+  function onPointerDown(e) {
+    isDragging = true;
+    drawer.classList.add("dragging");
+
+    startY = e.clientY;
+    startTranslateY = getCurrentTranslateY();
+    currentTranslateY = startTranslateY;
+
+    handle.setPointerCapture?.(e.pointerId);
+  }
+
+  function onPointerMove(e) {
+    if (!isDragging) return;
+
+    const deltaY = e.clientY - startY;
+    const contentHeight = content.offsetHeight;
+
+    const closedY = contentHeight - 72;
+    const nextY = Math.max(0, Math.min(closedY, startTranslateY + deltaY));
+
+    currentTranslateY = nextY;
+    content.style.transform = `translateY(${nextY}px)`;
+  }
+
+  function onPointerUp(e) {
+    if (!isDragging) return;
+    isDragging = false;
+    drawer.classList.remove("dragging");
+
+    const mode = snapDrawerByOffset(currentTranslateY, content.offsetHeight);
+
+    content.style.transform = "";
+
+    if (mode === "open") {
+      setDrawerState("open");
+    } else if (mode === "mid") {
+      setDrawerState("mid");
+    } else {
+      setDrawerState("closed");
+    }
+
+    handle.releasePointerCapture?.(e.pointerId);
+  }
+
+  handle.addEventListener("pointerdown", onPointerDown);
+  window.addEventListener("pointermove", onPointerMove);
+  window.addEventListener("pointerup", onPointerUp);
+
+  handle.addEventListener("click", () => {
+    if (drawer.classList.contains("open")) {
+      setDrawerState("mid");
+    } else {
+      setDrawerState("open");
+    }
   });
 }
 
 export function renderOverviewPreview() {
-  const tbody = document.getElementById("overviewPreviewBody");
-  const summary = document.getElementById("bottomDrawerSummary");
-
+  const { tbody, summary } = getDrawerElements();
   if (!tbody || !summary) return;
 
   if (!state.colorAnalysisComplete || state.colorOverviewRows.length === 0) {
@@ -49,8 +151,7 @@ export function renderOverviewPreview() {
 }
 
 export function resetOverviewPreview() {
-  const tbody = document.getElementById("overviewPreviewBody");
-  const summary = document.getElementById("bottomDrawerSummary");
+  const { tbody, summary } = getDrawerElements();
 
   if (summary) {
     summary.textContent = "Run color analysis to preview grouped color results.";
