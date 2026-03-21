@@ -78,6 +78,39 @@
     <div class="footerHint">
       Tip: after closing polygon, you can export JSON, a binary mask, or color results.
     </div>
+
+    <div id="bottomDrawer" class="bottomDrawer">
+      <button id="bottomDrawerToggle" class="bottomDrawerToggle" type="button">
+        Color Overview Preview
+      </button>
+
+      <div id="bottomDrawerContent" class="bottomDrawerContent">
+        <div class="bottomDrawerInner">
+          <h3>Regional Color Overview</h3>
+          <div id="bottomDrawerSummary" class="hint">
+            Run color analysis to preview grouped color results.
+          </div>
+
+          <div class="tableWrap">
+            <table class="overviewTable">
+              <thead>
+                <tr>
+                  <th>General Color</th>
+                  <th>Range Label</th>
+                  <th>Pixel Count</th>
+                  <th>% of Area</th>
+                </tr>
+              </thead>
+              <tbody id="overviewPreviewBody">
+                <tr>
+                  <td colspan="4">No analysis results yet.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
   </main>
 

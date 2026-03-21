@@ -14,6 +14,10 @@ export const state = {
   colorAnalysisBtn: null,
   showOverlay: null,
 
+  bottomDrawer: null,
+  bottomDrawerToggle: null,
+  bottomDrawerContent: null,
+
   img: null,
   imgScale: 1,
   imgOffsetX: 0,
@@ -25,11 +29,8 @@ export const state = {
   colorAnalysisMode: false,
   colorAnalysisComplete: false,
   
-  // detailed
   colorHexCounts: [],
   totalPixelsInSelection: 0,
-
-  // overview
   colorBinnedCounts: [],
   colorOverviewRows: []
 };

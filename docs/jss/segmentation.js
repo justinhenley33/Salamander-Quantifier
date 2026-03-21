@@ -1,6 +1,7 @@
 import { state } from "./state.js";
 import { clamp, setStatus } from "./utils.js";
 import { canvasToImage, draw, isInsideImage } from "./canvas.js";
+import { resetOverviewPreview } from "./drawer.js";
 
 function updatePointButtons() {
   state.undoBtn.disabled = state.points.length === 0;
@@ -16,6 +17,7 @@ function resetColorAnalysisState() {
   if (state.exportColorCsvBtn) {
     state.exportColorCsvBtn.disabled = true;
   }
+  resetOverviewPreview();
 }
 
 export function addPointFromEvent(evt) {

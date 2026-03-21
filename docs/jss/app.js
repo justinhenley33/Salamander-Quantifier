@@ -10,6 +10,7 @@ import {
 import { exportJson, exportMask, exportColorCsv, exportColorBinnedCsv } from "./export.js";
 import { runColorAnalysis } from "./color.js";
 import { setStatus, enableTools } from "./utils.js";
+import { initBottomDrawer, resetOverviewPreview } from "./drawer.js";
 
 export function initApp() {
   state.canvas = document.getElementById("canvas");
@@ -68,6 +69,9 @@ export function initApp() {
     resizeCanvasToWrapper();
     draw();
   });
+
+  initBottomDrawer();
+  resetOverviewPreview();
 
   resizeCanvasToWrapper();
   setStatus("Upload an image to begin.");

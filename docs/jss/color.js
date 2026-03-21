@@ -1,6 +1,7 @@
 import { state } from "./state.js";
 import { draw } from "./canvas.js";
 import { setStatus } from "./utils.js";
+import { renderOverviewPreview } from "./drawer.js";
 
 function componentToHex(v) {
   return v.toString(16).padStart(2, "0").toUpperCase();
@@ -212,5 +213,6 @@ export function runColorAnalysis() {
   }
 
   draw();
-  setStatus("Color analysis complete. Export workbook when ready.");
+  renderOverviewPreview();
+  setStatus("Color analysis complete. Review the drawer preview or export when ready.");
 }
