@@ -7,6 +7,17 @@ function updatePointButtons() {
   state.clearBtn.disabled = state.points.length === 0;
 }
 
+function resetColorAnalysisState() {
+  state.colorAnalysisMode = false;
+  state.colorAnalysisComplete = false;
+  state.colorAnalysisResults = [];
+  state.colorAnalysisSummary = null;
+
+  if (state.exportColorCsvBtn) {
+    state.exportColorCsvBtn.disabled = true;
+  }
+}
+
 export function addPointFromEvent(evt) {
   if (!state.img) return;
   if (state.polygonClosed) return;
@@ -27,6 +38,7 @@ export function addPointFromEvent(evt) {
     y: clamp(p.y, 0, state.img.height)
   });
 
+  resetColorAnalysisState();
   updatePointButtons();
   draw();
 }
@@ -40,7 +52,7 @@ export function closePolygon() {
   }
 
   state.polygonClosed = true;
-  setStatus("Polygon closed. You can export JSON or a mask PNG.");
+  setStatus("Polygon closed. You can export JSON, a binary mask PNG, or run color analysis.");
   draw();
 }
 

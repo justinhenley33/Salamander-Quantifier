@@ -7,7 +7,8 @@ import {
   undoPoint,
   clearPolygon
 } from "./segmentation.js";
-import { exportJson, exportMask } from "./export.js";
+import { exportJson, exportMask, exportColorCsv } from "./export.js";
+import { runColorAnalysis } from "./color.js";
 import { setStatus, enableTools } from "./utils.js";
 
 export function initApp() {
@@ -22,7 +23,12 @@ export function initApp() {
   state.clearBtn = document.getElementById("clearBtn");
   state.exportJsonBtn = document.getElementById("exportJsonBtn");
   state.exportMaskBtn = document.getElementById("exportMaskBtn");
+  state.colorAnalysisBtn = document.getElementById("colorAnalysisBtn");
+  state.exportColorCsvBtn = document.getElementById("exportColorCsvBtn");
   state.showOverlay = document.getElementById("showOverlay");
+
+  const exportMenuToggle = document.getElementById("exportMenuToggle");
+  const exportPopover = document.getElementById("exportPopover");
 
   state.fileInput.addEventListener("change", handleFileChange);
   state.canvas.addEventListener("click", addPointFromEvent);
@@ -30,8 +36,29 @@ export function initApp() {
   state.undoBtn.addEventListener("click", undoPoint);
   state.clearBtn.addEventListener("click", clearPolygon);
   state.showOverlay.addEventListener("change", draw);
+
   state.exportJsonBtn.addEventListener("click", exportJson);
   state.exportMaskBtn.addEventListener("click", exportMask);
+  state.exportColorCsvBtn.addEventListener("click", exportColorCsv);
+  state.colorAnalysisBtn.addEventListener("click", runColorAnalysis);
+
+  state.exportColorCsvBtn.disabled = true;
+
+  if (exportMenuToggle && exportPopover) {
+    exportMenuToggle.addEventListener("click", (e) => {
+      e.preventDefault();
+      exportPopover.classList.toggle("hidden");
+    });
+
+    document.addEventListener("click", (e) => {
+      const clickedToggle = exportMenuToggle.contains(e.target);
+      const clickedPopover = exportPopover.contains(e.target);
+
+      if (!clickedToggle && !clickedPopover) {
+        exportPopover.classList.add("hidden");
+      }
+    });
+  }
 
   window.addEventListener("resize", () => {
     resizeCanvasToWrapper();

@@ -51,3 +51,54 @@ export function exportMask() {
 
   setStatus("Exported mask.png (white region = selection).");
 }
+
+function csvEscape(value) {
+  const str = String(value);
+  if (str.includes(",") || str.includes('"') || str.includes("\n")) {
+    return `"${str.replace(/"/g, '""')}"`;
+  }
+  return str;
+}
+
+export function exportColorCsv() {
+  if (!state.colorAnalysisComplete || state.colorAnalysisResults.length === 0) {
+    setStatus("Run color analysis before exporting Color CSV.");
+    return;
+  }
+
+  const headers = [
+    "filename",
+    "color common name",
+    "hex value",
+    "pixel count within region that had that hex color",
+    "total pixels in selection",
+    "% this color in area",
+    "photosize",
+    "timestamp"
+  ];
+
+  const lines = [headers.map(csvEscape).join(",")];
+
+  for (const row of state.colorAnalysisResults) {
+    lines.push(
+      [
+        row.filename,
+        row.colorCommonName,
+        row.hexValue,
+        row.pixelCountWithinRegion,
+        row.totalPixelsInSelection,
+        row.percentThisColorInArea,
+        row.photoSize,
+        row.timestamp
+      ]
+        .map(csvEscape)
+        .join(",")
+    );
+  }
+
+  const csv = lines.join("\n");
+  const baseName = (state.imageFilename || "image").replace(/\.[^.]+$/, "");
+  downloadTextFile(`${baseName}_color_analysis.csv`, csv, "text/csv");
+
+  setStatus("Exported color analysis CSV.");
+}

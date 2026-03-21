@@ -11,8 +11,9 @@
     <div class="brand">Salamander Quantifier</div>
     <nav class="nav">
       <a href="#" class="navlink">Upload</a>
-      <a href="#" class="navlink">Export</a>
+      <a href="#" id="exportMenuToggle" class="navlink">Export</a>
       <a href="#" class="navlink">Help</a>
+
     </nav>
   </header>
 
@@ -46,14 +47,11 @@
       </div>
 
       <div class="block">
-        <h3>Export</h3>
-        <div class="row">
-          <button id="exportJsonBtn" class="btn2" disabled>Polygon JSON</button>
-          <button id="exportMaskBtn" class="btn2" disabled>Mask PNG</button>
-        </div>
+        <h3>Color Analysis</h3>
         <div class="hint">
-          Mask is white = selected region, black = background.
+          Analyze the colors inside the selected polygon region.
         </div>
+        <button id="colorAnalysisBtn" class="btn2" disabled>Color Analysis</button>
       </div>
 
       <div class="block">
@@ -62,14 +60,22 @@
       </div>
     </aside>
 
-    <section class="viewer">
-      <div class="canvasWrap">
-        <canvas id="canvas"></canvas>
-      </div>
-      <div class="footerHint">
-        Tip: after closing polygon, you can export JSON or a binary mask.
-      </div>
-    </section>
+  <section class="viewer">
+    <div class="canvasWrap">
+      <canvas id="canvas"></canvas>
+    </div>
+
+    <div id="exportPopover" class="exportPopover hidden">
+      <div class="exportPopoverTitle">Export</div>
+      <button id="exportJsonBtn" class="btn2" disabled>Polygon JSON</button>
+      <button id="exportMaskBtn" class="btn2" disabled>Mask PNG</button>
+      <button id="exportColorCsvBtn" class="btn2" disabled>Export Color CSV</button>
+    </div>
+
+    <div class="footerHint">
+      Tip: after closing polygon, you can export JSON, a binary mask, or color results.
+    </div>
+  </section>
   </main>
 
   <script type="module" src="jss/main.js"></script>

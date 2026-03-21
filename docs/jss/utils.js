@@ -13,7 +13,9 @@ export function enableTools(enabled) {
   state.clearBtn.disabled = !enabled;
   state.exportJsonBtn.disabled = !enabled;
   state.exportMaskBtn.disabled = !enabled;
+  state.colorAnalysisBtn.disabled = !enabled;
 }
+
 
 export function downloadDataUrl(filename, url, revoke = false) {
   const a = document.createElement("a");
@@ -28,8 +30,8 @@ export function downloadDataUrl(filename, url, revoke = false) {
   }
 }
 
-export function downloadTextFile(filename, text) {
-  const blob = new Blob([text], { type: "application/json" });
+export function downloadTextFile(filename, text, mimeType = "application/json") {
+  const blob = new Blob([text], { type: mimeType });
   const url = URL.createObjectURL(blob);
   downloadDataUrl(filename, url, true);
 }

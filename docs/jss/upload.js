@@ -15,10 +15,20 @@ export function handleFileChange(e) {
     state.img = image;
     resetPolygon();
 
+    state.colorAnalysisMode = false;
+    state.colorAnalysisComplete = false;
+    state.colorAnalysisResults = [];
+    state.colorAnalysisSummary = null;
+
     resizeCanvasToWrapper();
     draw();
 
     enableTools(true);
+
+    if (state.exportColorCsvBtn) {
+      state.exportColorCsvBtn.disabled = true;
+    }
+    
     setStatus("Click to add polygon points. Double-click to close.");
     URL.revokeObjectURL(url);
   };

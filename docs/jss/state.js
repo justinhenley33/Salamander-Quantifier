@@ -10,6 +10,8 @@ export const state = {
   clearBtn: null,
   exportJsonBtn: null,
   exportMaskBtn: null,
+  exportColorCsvBtn: null,
+  colorAnalysisBtn: null,
   showOverlay: null,
 
   img: null,
@@ -18,5 +20,10 @@ export const state = {
   imgOffsetY: 0,
 
   points: [],
-  polygonClosed: false
+  polygonClosed: false,
+
+  colorAnalysisMode: false,
+  colorAnalysisComplete: false,
+  colorAnalysisResults: [],
+  colorAnalysisSummary: null
 };

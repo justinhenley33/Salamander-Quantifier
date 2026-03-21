@@ -81,8 +81,17 @@ export function draw() {
   if (state.points.length > 0) {
     state.ctx.save();
     state.ctx.lineWidth = 2;
-    state.ctx.strokeStyle = "rgba(89,210,255,0.95)";
-    state.ctx.fillStyle = "rgba(89,210,255,0.18)";
+
+    const strokeColor = state.colorAnalysisMode
+      ? "rgba(170, 90, 255, 0.98)"
+      : "rgba(89,210,255,0.95)";
+
+    const fillColor = state.colorAnalysisMode
+      ? "rgba(170, 90, 255, 0.22)"
+      : "rgba(89,210,255,0.18)";
+
+    state.ctx.strokeStyle = strokeColor;
+    state.ctx.fillStyle = fillColor;
 
     state.ctx.beginPath();
     const first = imageToCanvas(state.points[0].x, state.points[0].y);
