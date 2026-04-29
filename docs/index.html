@@ -10,7 +10,10 @@
   <header class="topbar">
     <div class="brand">Salamander Quantifier</div>
     <nav class="nav">
-      <a href="#" class="navlink">Upload</a>
+      <label class="navlink uploadNavLabel">
+        Upload
+        <input id="fileInput" type="file" accept="image/*" hidden />
+      </label>
       <a href="#" id="exportMenuToggle" class="navlink">Export</a>
       <a href="#" class="navlink">Help</a>
 
@@ -20,14 +23,6 @@
   <main class="layout">
     <aside class="sidebar">
       <h2>TOOLS</h2>
-
-      <div class="block">
-        <label class="btn">
-          Upload Image
-          <input id="fileInput" type="file" accept="image/*" hidden />
-        </label>
-        <div id="fileName" class="hint">No file selected</div>
-      </div>
 
       <div class="block">
         <h3>Manual Segmentation (Polygon)</h3>
@@ -44,6 +39,9 @@
           <input id="showOverlay" type="checkbox" checked />
           Show overlay
         </label>
+
+        <div id="fileName" class="hint">
+          No file selected
       </div>
 
       <div class="block">
