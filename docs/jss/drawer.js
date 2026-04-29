@@ -14,32 +14,6 @@ function getDrawerElements() {
   };
 }
 
-function setDrawerState(mode) {
-  const { drawer } = getDrawerElements();
-  if (!drawer) return;
-
-  drawer.classList.remove("open", "mid");
-  if (mode === "open") drawer.classList.add("open");
-  if (mode === "mid") drawer.classList.add("mid");
-}
-
-function snapDrawerByOffset(offsetY, contentHeight) {
-  // offsetY = current translateY in px
-  // smaller offset => more open
-  const closedY = contentHeight - 56;
-  const midY = contentHeight * 0.45;
-  const openY = 0;
-
-  const distances = [
-    { mode: "open", dist: Math.abs(offsetY - openY), y: openY },
-    { mode: "mid", dist: Math.abs(offsetY - midY), y: midY },
-    { mode: "closed", dist: Math.abs(offsetY - closedY), y: closedY }
-  ];
-
-  distances.sort((a, b) => a.dist - b.dist);
-  return distances[0].mode;
-}
-
 export function initBottomDrawer() {
   const { drawer, content, handle } = getDrawerElements();
   if (!drawer || !content || !handle) return;
@@ -54,8 +28,6 @@ export function initBottomDrawer() {
     const transform = style.transform;
 
     if (!transform || transform === "none") {
-      if (drawer.classList.contains("open")) return 0;
-      if (drawer.classList.contains("mid")) return content.offsetHeight * 0.45;
       return content.offsetHeight - 56;
     }
 
@@ -80,8 +52,12 @@ export function initBottomDrawer() {
     const deltaY = e.clientY - startY;
     const contentHeight = content.offsetHeight;
 
-    const closedY = contentHeight - 56;
-    const nextY = Math.max(0, Math.min(closedY, startTranslateY + deltaY));
+    const maxTranslateY = contentHeight - 56;
+
+    const nextY = Math.max(
+      0,
+      Math.min(maxTranslateY, startTranslateY + deltaY)
+    );
 
     currentTranslateY = nextY;
     content.style.transform = `translateY(${nextY}px)`;
@@ -89,20 +65,9 @@ export function initBottomDrawer() {
 
   function onPointerUp(e) {
     if (!isDragging) return;
+
     isDragging = false;
     drawer.classList.remove("dragging");
-
-    const mode = snapDrawerByOffset(currentTranslateY, content.offsetHeight);
-
-    content.style.transform = "";
-
-    if (mode === "open") {
-      setDrawerState("open");
-    } else if (mode === "mid") {
-      setDrawerState("mid");
-    } else {
-      setDrawerState("closed");
-    }
 
     handle.releasePointerCapture?.(e.pointerId);
   }
@@ -110,17 +75,8 @@ export function initBottomDrawer() {
   handle.addEventListener("pointerdown", onPointerDown);
   window.addEventListener("pointermove", onPointerMove);
   window.addEventListener("pointerup", onPointerUp);
-
-  handle.addEventListener("click", () => {
-    if (drawer.classList.contains("open")) {
-      setDrawerState("mid");
-    } else if (drawer.classList.contains("mid")) {
-      setDrawerState("closed");
-    } else {
-      setDrawerState("open");
-    }
-  });
 }
+
 // comment
 export function renderOverviewPreview() {
   const { tbody, summary } = getDrawerElements();

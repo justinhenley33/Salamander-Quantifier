@@ -211,14 +211,6 @@ canvas{
   transition: none;
 }
 
-.bottomDrawer.open .bottomDrawerContent {
-  transform: translateY(0);
-}
-
-.bottomDrawer.mid .bottomDrawerContent {
-  transform: translateY(45vh);
-}
-
 .bottomDrawerHandle {
   display: flex;
   flex-direction: column;
