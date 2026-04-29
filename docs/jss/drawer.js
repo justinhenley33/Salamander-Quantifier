@@ -26,8 +26,8 @@ function setDrawerState(mode) {
 function snapDrawerByOffset(offsetY, contentHeight) {
   // offsetY = current translateY in px
   // smaller offset => more open
-  const closedY = contentHeight - 72;
-  const midY = contentHeight - 180;
+  const closedY = contentHeight - 56;
+  const midY = contentHeight * 0.45;
   const openY = 0;
 
   const distances = [
@@ -55,8 +55,8 @@ export function initBottomDrawer() {
 
     if (!transform || transform === "none") {
       if (drawer.classList.contains("open")) return 0;
-      if (drawer.classList.contains("mid")) return content.offsetHeight - 180;
-      return content.offsetHeight - 72;
+      if (drawer.classList.contains("mid")) return content.offsetHeight * 0.45;
+      return content.offsetHeight - 56;
     }
 
     const matrix = new DOMMatrix(transform);
@@ -80,7 +80,7 @@ export function initBottomDrawer() {
     const deltaY = e.clientY - startY;
     const contentHeight = content.offsetHeight;
 
-    const closedY = contentHeight - 72;
+    const closedY = contentHeight - 56;
     const nextY = Math.max(0, Math.min(closedY, startTranslateY + deltaY));
 
     currentTranslateY = nextY;
@@ -114,6 +114,8 @@ export function initBottomDrawer() {
   handle.addEventListener("click", () => {
     if (drawer.classList.contains("open")) {
       setDrawerState("mid");
+    } else if (drawer.classList.contains("mid")) {
+      setDrawerState("closed");
     } else {
       setDrawerState("open");
     }
