@@ -192,9 +192,9 @@ canvas{
   left: 0;
   right: 0;
   bottom: 0;
-  height: 42%;
-  min-height: 220px;
-  max-height: 75%;
+  height: 100vh;
+  max-height: 100vh;
+  min-height: 300px;
   background: rgba(20, 24, 32, 0.94);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -202,7 +202,7 @@ canvas{
   border-top-right-radius: 18px;
   box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.24);
   overflow: hidden;
-  transform: translateY(calc(100% - 72px));
+  transform: translateY(calc(100% - 48px));
   transition: transform 0.22s ease;
   touch-action: none;
 }
@@ -216,7 +216,7 @@ canvas{
 }
 
 .bottomDrawer.mid .bottomDrawerContent {
-  transform: translateY(calc(100% - 180px));
+  transform: translateY(45vh);
 }
 
 .bottomDrawerHandle {
@@ -249,6 +249,8 @@ canvas{
 }
 
 .bottomDrawerInner {
+  display: flex;
+  flex-direction: column;
   padding: 0 18px 18px;
   color: white;
   height: calc(100% - 64px);
@@ -256,7 +258,8 @@ canvas{
 }
 
 .tableWrap {
-  max-height: 250px;
+  flex: 1;
+  min-height: 0;
   overflow: auto;
   margin-top: 12px;
 }
