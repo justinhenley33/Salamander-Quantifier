@@ -194,12 +194,10 @@ canvas{
 
 .bottomDrawerContent {
   pointer-events: auto;
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: calc(100vh - 500px);
-  max-height: calc(100vh - 500px);
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 56px);
+  max-height: calc(100vh - 56px);
   min-height: 300px;
   background: rgba(20, 24, 32, 0.94);
   backdrop-filter: blur(8px);
