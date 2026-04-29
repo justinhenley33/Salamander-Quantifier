@@ -208,7 +208,6 @@ canvas{
   border-top-right-radius: 18px;
   box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.24);
   overflow: hidden;
-  transform: translateY(calc(100% - 56px));
   transition: transform 0.12s ease-out;
   touch-action: none;
 }

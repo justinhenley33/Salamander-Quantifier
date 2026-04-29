@@ -23,6 +23,9 @@ export function initBottomDrawer() {
   let startTranslateY = 0;
   let currentTranslateY = 0;
 
+  const initialTranslateY = content.offsetHeight - 56;
+  content.style.transform = `translateY(${initialTranslateY}px)`;
+
   function getCurrentTranslateY() {
     const style = window.getComputedStyle(content);
     const transform = style.transform;
@@ -53,7 +56,7 @@ export function initBottomDrawer() {
     const contentHeight = content.offsetHeight;
 
     const maxTranslateY = contentHeight - 56;
-    const minTranslateY = 200;
+    const minTranslateY = 56;
 
     const nextY = Math.max(
       minTranslateY,
