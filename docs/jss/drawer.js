@@ -53,7 +53,7 @@ export function initBottomDrawer() {
     const contentHeight = content.offsetHeight;
 
     const maxTranslateY = contentHeight - 56;
-    const minTranslateY = 18;
+    const minTranslateY = 200;
 
     const nextY = Math.max(
       minTranslateY,
