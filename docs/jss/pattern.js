@@ -41,7 +41,8 @@ export function runPatternAnalysis({
   const clustered = dbscan(spots, eps, 3);
 
   // STEP 6: visualization
-  drawOverlay(overlayCanvas, clustered, width, height, selectedRegion);
+  // drawOverlay(overlayCanvas, clustered, width, height, selectedRegion);
+  debugDrawMask(overlayCanvas, cleaned, width, height);
 
   return {
     spots: clustered,
@@ -431,4 +432,20 @@ export function exportPatternCSV(spots) {
   }
 
   return rows.join("\n");
+}
+
+function debugDrawMask(canvas, mask, width, height) {
+  const ctx = canvas.getContext("2d");
+  const imgData = ctx.createImageData(width, height);
+
+  for (let i = 0; i < mask.length; i++) {
+    const val = mask[i] ? 255 : 0;
+
+    imgData.data[i * 4] = val;
+    imgData.data[i * 4 + 1] = val;
+    imgData.data[i * 4 + 2] = val;
+    imgData.data[i * 4 + 3] = 255;
+  }
+
+  ctx.putImageData(imgData, 0, 0);
 }
