@@ -338,16 +338,23 @@ function detectBlobsOpenCV(imageCanvas, polygonMask) {
 
   // --- threshold (THIS is key) ---
   let thresh = new cv.Mat();
-  cv.threshold(blurred, thresh, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU);
+
+  cv.threshold(blurred, thresh, 180, 255, cv.THRESH_BINARY);
+
+  // debug display
+  const debugCanvas = document.getElementById("debugCanvas");
+  debugCanvas.width = width;
+  debugCanvas.height = height;
+
+  cv.imshow("debugCanvas", thresh);
 
   // --- blob detector params ---
   let params = new cv.SimpleBlobDetector_Params();
 
-  params.filterByColor = true;
-  params.blobColor = 255; // white blobs
+  params.filterByColor = false;
 
   params.filterByArea = true;
-  params.minArea = 30;     // 🔧 tune this
+  params.minArea = 20;  
   params.maxArea = 10000;
 
   params.filterByCircularity = false;
