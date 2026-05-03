@@ -99,8 +99,7 @@ function detectSpotsContours(imageCanvas, polygonMask) {
   // ===============================
   let thresh = new cv.Mat();
 
-  // 🔥 TUNE THIS VALUE IF NEEDED
-  cv.threshold(blurred, thresh, 150, 255, cv.THRESH_BINARY);
+  cv.threshold(blurred, thresh, 200, 255, cv.THRESH_BINARY);
 
   // ===============================
   // DEBUG VIEW (optional)
