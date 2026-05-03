@@ -43,8 +43,6 @@ export function initApp() {
   state.clearBtn.addEventListener("click", clearPolygon);
   state.showOverlay.addEventListener("change", draw);
   state.overlayCanvas = document.createElement("canvas");
-  state.overlayCanvas.width = state.canvas.width;
-  state.overlayCanvas.height = state.canvas.height;
 
   state.exportJsonBtn.addEventListener("click", exportJson);
   state.exportMaskBtn.addEventListener("click", exportMask);
@@ -83,9 +81,15 @@ export function initApp() {
   });
 
   state.runPatternBtn.addEventListener("click", () => {
+    if (!state.img || !state.polygonClosed) {
+      setStatus("Draw and close a polygon first.");
+      return;
+    }
+
     const result = runPatternAnalysis({
       imageCanvas: state.canvas,
-      overlayCanvas: state.overlayCanvas
+      overlayCanvas: state.overlayCanvas,
+      selectedRegion: state.points
     });
 
     state.patternResults = result.spots;
