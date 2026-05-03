@@ -14,6 +14,7 @@ export function enableTools(enabled) {
   state.exportJsonBtn.disabled = !enabled;
   state.exportMaskBtn.disabled = !enabled;
   state.colorAnalysisBtn.disabled = !enabled;
+  state.runPatternBtn.disabled = !enabled;
 }
 
 
