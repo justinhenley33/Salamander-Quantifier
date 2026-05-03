@@ -6,13 +6,17 @@ export function runPatternAnalysis({
   overlayCanvas,
   selectedRegion
 }) {
+  if (!window.cvReady) {
+    console.warn("OpenCV not ready yet");
+    return { spots: [], eps: 0 };
+  }
   const ctx = imageCanvas.getContext("2d");
   const width = imageCanvas.width;
   const height = imageCanvas.height;
 
   const imageData = ctx.getImageData(0, 0, width, height);
 
-  // 🔴 STEP 0: polygon mask
+  // STEP 0: polygon mask
   const polygonMask = createPolygonMask(width, height, selectedRegion);
 
   // STEP 1: preprocess
@@ -33,7 +37,7 @@ export function runPatternAnalysis({
   }
 
   // STEP 4: connected components
-  const spots = findConnectedComponents(cleaned, width, height);
+  const spots = detectBlobsOpenCV(imageCanvas, polygonMask);
 
   // STEP 5: DBSCAN
   const eps = estimateDbscanEpsilon(spots);
@@ -300,6 +304,82 @@ function findConnectedComponents(mask, width, height) {
       });
     }
   }
+
+  return spots;
+}
+
+function detectBlobsOpenCV(imageCanvas, polygonMask) {
+  const ctx = imageCanvas.getContext("2d", { willReadFrequently: true });
+  const width = imageCanvas.width;
+  const height = imageCanvas.height;
+
+  const imageData = ctx.getImageData(0, 0, width, height);
+
+  let src = cv.matFromImageData(imageData);
+
+  // --- mask out everything outside polygon ---
+  if (polygonMask) {
+    for (let i = 0; i < polygonMask.length; i += 4) {
+      if (polygonMask[i] === 0) {
+        src.data[i] = 0;
+        src.data[i + 1] = 0;
+        src.data[i + 2] = 0;
+      }
+    }
+  }
+
+  // grayscale
+  let gray = new cv.Mat();
+  cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+
+  // blur for stability
+  let blurred = new cv.Mat();
+  cv.GaussianBlur(gray, blurred, new cv.Size(5, 5), 0);
+
+  // --- threshold (THIS is key) ---
+  let thresh = new cv.Mat();
+  cv.threshold(blurred, thresh, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU);
+
+  // --- blob detector params ---
+  let params = new cv.SimpleBlobDetector_Params();
+
+  params.filterByColor = true;
+  params.blobColor = 255; // white blobs
+
+  params.filterByArea = true;
+  params.minArea = 30;     // 🔧 tune this
+  params.maxArea = 10000;
+
+  params.filterByCircularity = false;
+  params.filterByConvexity = false;
+  params.filterByInertia = false;
+
+  let detector = new cv.SimpleBlobDetector(params);
+
+  let keypoints = new cv.KeyPointVector();
+  detector.detect(thresh, keypoints);
+
+  const spots = [];
+
+  for (let i = 0; i < keypoints.size(); i++) {
+    const kp = keypoints.get(i);
+
+    spots.push({
+      id: i,
+      x: kp.pt.x,
+      y: kp.pt.y,
+      area: Math.PI * Math.pow(kp.size / 2, 2)
+    });
+  }
+
+  console.log("OpenCV spots:", spots.length);
+
+  // cleanup
+  src.delete();
+  gray.delete();
+  blurred.delete();
+  thresh.delete();
+  keypoints.delete();
 
   return spots;
 }
