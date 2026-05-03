@@ -9,6 +9,10 @@
 <body>
   <header class="topbar">
     <div class="brand">Salamander Quantifier</div>
+
+    <!-- ✅ ADDED: filename display -->
+    <div id="fileName" class="fileName"></div>
+
     <nav class="nav">
       <label class="navlink uploadNavLabel">
         Upload
@@ -16,7 +20,6 @@
       </label>
       <a href="#" id="exportMenuToggle" class="navlink">Export</a>
       <a href="#" class="navlink">Help</a>
-
     </nav>
   </header>
 
@@ -46,7 +49,9 @@
         <div class="hint">
           Analyze the colors inside the selected region.
         </div>
-        <button id="colorAnalysisBtn" class="btn2" disabled>Color Analysis</button>
+        <button id="colorAnalysisBtn" class="btn2" disabled>
+          Color Analysis
+        </button>
       </div>
 
       <div class="block">
@@ -65,68 +70,82 @@
       </div>
     </aside>
 
-  <section class="viewer">
-    <div class="canvasWrap">
-      <canvas id="canvas"></canvas>
-    </div>
+    <section class="viewer">
+      <div class="canvasWrap">
+        <canvas id="canvas"></canvas>
+      </div>
 
-    <div id="exportPopover" class="exportPopover hidden">
-      <div class="exportPopoverTitle">Export</div>
+      <div id="exportPopover" class="exportPopover hidden">
+        <div class="exportPopoverTitle">Export</div>
 
-      <button id="exportJsonBtn" class="btn2" disabled>Polygon JSON</button>
-      <button id="exportMaskBtn" class="btn2" disabled>Mask PNG</button>
-      <button id="exportColorCsvBtn" class="btn2" disabled>Export Color CSV</button>
-      <button id="exportColorBinnedBtn" class="btn2" disabled>
-        Export Binned (32)
-      </button>
+        <button id="exportJsonBtn" class="btn2" disabled>
+          Polygon JSON
+        </button>
 
-      <div class="exportDivider"></div>
-      <div class="exportSubTitle">Pattern Analysis</div>
-      <button id="exportPatternCsvBtn" class="btn2" disabled>
-        Export Pattern CSV
-      </button>
-      <button id="exportPatternOverlayBtn" class="btn2" disabled>
-        Export Pattern Overlay
-      </button>
-    </div>
+        <button id="exportMaskBtn" class="btn2" disabled>
+          Mask PNG
+        </button>
 
-    <div class="footerHint">
-      Tip: after closing polygon, you can export JSON, a binary mask, or color results.
-    </div>
+        <button id="exportColorCsvBtn" class="btn2" disabled>
+          Export Color CSV
+        </button>
 
-    <div id="bottomDrawer" class="bottomDrawer">
-      <div id="bottomDrawerContent" class="bottomDrawerContent">
-        <div id="bottomDrawerHandle" class="bottomDrawerHandle">
-          <div class="bottomDrawerGrip"></div>
-          <div class="bottomDrawerTitle">Color Overview Preview</div>
-        </div>
+        <button id="exportColorBinnedBtn" class="btn2" disabled>
+          Export Binned (32)
+        </button>
 
-        <div class="bottomDrawerInner">
-          <div id="bottomDrawerSummary" class="hint">
-            Run color analysis to preview grouped color results.
+        <div class="exportDivider"></div>
+
+        <div class="exportSubTitle">Pattern Analysis</div>
+
+        <button id="exportPatternCsvBtn" class="btn2" disabled>
+          Export Pattern CSV
+        </button>
+
+        <button id="exportPatternOverlayBtn" class="btn2" disabled>
+          Export Pattern Overlay
+        </button>
+      </div>
+
+      <div class="footerHint">
+        Tip: after closing polygon, you can export JSON, a binary mask, or color results.
+      </div>
+
+      <div id="bottomDrawer" class="bottomDrawer">
+        <div id="bottomDrawerContent" class="bottomDrawerContent">
+          <div id="bottomDrawerHandle" class="bottomDrawerHandle">
+            <div class="bottomDrawerGrip"></div>
+            <div class="bottomDrawerTitle">
+              Color Overview Preview
+            </div>
           </div>
 
-          <div class="tableWrap">
-            <table class="overviewTable">
-              <thead>
-                <tr>
-                  <th>General Color</th>
-                  <th>Range Label</th>
-                  <th>Pixel Count</th>
-                  <th>% of Area</th>
-                </tr>
-              </thead>
-              <tbody id="overviewPreviewBody">
-                <tr>
-                  <td colspan="4">No analysis results yet.</td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="bottomDrawerInner">
+            <div id="bottomDrawerSummary" class="hint">
+              Run color analysis to preview grouped color results.
+            </div>
+
+            <div class="tableWrap">
+              <table class="overviewTable">
+                <thead>
+                  <tr>
+                    <th>General Color</th>
+                    <th>Range Label</th>
+                    <th>Pixel Count</th>
+                    <th>% of Area</th>
+                  </tr>
+                </thead>
+                <tbody id="overviewPreviewBody">
+                  <tr>
+                    <td colspan="4">No analysis results yet.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
   </main>
 
   <script type="module" src="jss/main.js"></script>
