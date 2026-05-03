@@ -21,10 +21,10 @@ export function runPatternAnalysis({
   const stretched = contrastStretch(blurred);
 
   // STEP 2: segmentation
-  const mask = adaptiveThreshold(stretched, width, height, polygonMask);
+  const mask = contrastThreshold(stretched, width, height, polygonMask, 5, 20);
 
   // STEP 3: clean mask
-  let cleaned = closeMask(openMask(mask, width, height), width, height);
+  let cleaned = openMask(mask, width, height);
 
   // 🔴 enforce polygon again (prevents bleed)
   for (let i = 0; i < cleaned.length; i++) {
@@ -41,8 +41,7 @@ export function runPatternAnalysis({
   const clustered = dbscan(spots, eps, 3);
 
   // STEP 6: visualization
-  // drawOverlay(overlayCanvas, clustered, width, height, selectedRegion);
-  debugDrawMask(overlayCanvas, cleaned, width, height);
+  drawOverlay(overlayCanvas, clustered, width, height, selectedRegion);
 
   return {
     spots: clustered,
@@ -145,7 +144,7 @@ function contrastStretch(gray) {
 // =============================
 // STEP 2: THRESHOLD
 // =============================
-function adaptiveThreshold(gray, width, height, polygonMask, radius = 10, offset = 10) {
+function contrastThreshold(gray, width, height, polygonMask, radius = 5, diff = 25) {
   const mask = new Uint8ClampedArray(gray.length);
 
   for (let y = 0; y < height; y++) {
@@ -175,7 +174,7 @@ function adaptiveThreshold(gray, width, height, polygonMask, radius = 10, offset
       const localMean = sum / count;
       const val = gray[idx];
 
-      mask[idx] = val > localMean + offset ? 1 : 0;
+      mask[idx] = val > localMean + diff ? 1 : 0;
     }
   }
 
@@ -432,20 +431,4 @@ export function exportPatternCSV(spots) {
   }
 
   return rows.join("\n");
-}
-
-function debugDrawMask(canvas, mask, width, height) {
-  const ctx = canvas.getContext("2d");
-  const imgData = ctx.createImageData(width, height);
-
-  for (let i = 0; i < mask.length; i++) {
-    const val = mask[i] ? 255 : 0;
-
-    imgData.data[i * 4] = val;
-    imgData.data[i * 4 + 1] = val;
-    imgData.data[i * 4 + 2] = val;
-    imgData.data[i * 4 + 3] = 255;
-  }
-
-  ctx.putImageData(imgData, 0, 0);
 }
