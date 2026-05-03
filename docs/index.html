@@ -147,6 +147,20 @@
       </div>
     </section>
   </main>
+  <script>
+    window.cvReady = false;
+  </script>
+
+  <script
+    async
+    src="https://docs.opencv.org/4.x/opencv.js"
+    onload="
+      cv['onRuntimeInitialized'] = () => {
+        window.cvReady = true;
+        console.log('OpenCV.js ready');
+      };
+    "
+  ></script>
 
   <script type="module" src="jss/main.js"></script>
 </body>
