@@ -21,12 +21,11 @@ export function runPatternAnalysis({
   const stretched = contrastStretch(blurred);
 
   // STEP 2: segmentation
-  const mask = contrastThreshold(stretched, width, height, polygonMask, 5, 20);
+  const mask = spotThreshold(stretched, polygonMask);
 
   // STEP 3: clean mask
   let cleaned = openMask(mask, width, height);
 
-  // 🔴 enforce polygon again (prevents bleed)
   for (let i = 0; i < cleaned.length; i++) {
     if (polygonMask && polygonMask[i * 4] === 0) {
       cleaned[i] = 0;
@@ -42,6 +41,7 @@ export function runPatternAnalysis({
 
   // STEP 6: visualization
   drawOverlay(overlayCanvas, clustered, width, height, selectedRegion);
+  console.log("spots found:", spots.length);
 
   return {
     spots: clustered,
@@ -144,38 +144,31 @@ function contrastStretch(gray) {
 // =============================
 // STEP 2: THRESHOLD
 // =============================
-function contrastThreshold(gray, width, height, polygonMask, radius = 5, diff = 25) {
+function spotThreshold(gray, polygonMask) {
   const mask = new Uint8ClampedArray(gray.length);
 
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const idx = y * width + x;
+  let sum = 0;
+  let count = 0;
 
-      if (polygonMask && polygonMask[idx * 4] === 0) {
-        mask[idx] = 0;
-        continue;
-      }
+  // compute mean inside polygon
+  for (let i = 0; i < gray.length; i++) {
+    if (polygonMask && polygonMask[i * 4] === 0) continue;
+    sum += gray[i];
+    count++;
+  }
 
-      let sum = 0;
-      let count = 0;
+  const mean = sum / count;
 
-      for (let dy = -radius; dy <= radius; dy++) {
-        for (let dx = -radius; dx <= radius; dx++) {
-          const nx = x + dx;
-          const ny = y + dy;
+  // 🔴 lower threshold (key change)
+  const threshold = mean + 10;  // was too high before
 
-          if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
-            sum += gray[ny * width + nx];
-            count++;
-          }
-        }
-      }
-
-      const localMean = sum / count;
-      const val = gray[idx];
-
-      mask[idx] = val > localMean + diff ? 1 : 0;
+  for (let i = 0; i < gray.length; i++) {
+    if (polygonMask && polygonMask[i * 4] === 0) {
+      mask[i] = 0;
+      continue;
     }
+
+    mask[i] = gray[i] > threshold ? 1 : 0;
   }
 
   return mask;
@@ -386,6 +379,8 @@ function regionQuery(points, p, eps) {
 function drawOverlay(canvas, spots, width, height, polygon) {
   const ctx = canvas.getContext("2d");
   ctx.clearRect(0, 0, width, height);
+  ctx.fillStyle = "red";
+  ctx.arc(s.x, s.y, 6, 0, Math.PI * 2);
 
   // polygon outline
   if (polygon && polygon.length > 2) {
