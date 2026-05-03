@@ -74,9 +74,6 @@ export function initApp() {
   window.addEventListener("resize", () => {
     resizeCanvasToWrapper();
 
-    state.overlayCanvas.width = state.canvas.width;
-    state.overlayCanvas.height = state.canvas.height;
-
     draw();
   });
 
