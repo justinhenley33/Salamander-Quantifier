@@ -317,7 +317,7 @@ function detectBlobsOpenCV(imageCanvas, polygonMask) {
 
   let src = cv.matFromImageData(imageData);
 
-  // --- mask out everything outside polygon ---
+  // mask outside polygon
   if (polygonMask) {
     for (let i = 0; i < polygonMask.length; i += 4) {
       if (polygonMask[i] === 0) {
@@ -332,50 +332,53 @@ function detectBlobsOpenCV(imageCanvas, polygonMask) {
   let gray = new cv.Mat();
   cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
 
-  // blur for stability
+  // blur
   let blurred = new cv.Mat();
   cv.GaussianBlur(gray, blurred, new cv.Size(5, 5), 0);
 
-  // --- threshold (THIS is key) ---
+  // threshold (manual)
   let thresh = new cv.Mat();
-
   cv.threshold(blurred, thresh, 180, 255, cv.THRESH_BINARY);
 
-  // debug display
+  // DEBUG
   const debugCanvas = document.getElementById("debugCanvas");
   debugCanvas.width = width;
   debugCanvas.height = height;
-
   cv.imshow("debugCanvas", thresh);
 
-  // --- blob detector params ---
-  let params = new cv.SimpleBlobDetector_Params();
+  // --- FIND CONTOURS ---
+  let contours = new cv.MatVector();
+  let hierarchy = new cv.Mat();
 
-  params.filterByColor = false;
-
-  params.filterByArea = true;
-  params.minArea = 20;  
-  params.maxArea = 10000;
-
-  params.filterByCircularity = false;
-  params.filterByConvexity = false;
-  params.filterByInertia = false;
-
-  let detector = new cv.SimpleBlobDetector(params);
-
-  let keypoints = new cv.KeyPointVector();
-  detector.detect(thresh, keypoints);
+  cv.findContours(
+    thresh,
+    contours,
+    hierarchy,
+    cv.RETR_EXTERNAL,
+    cv.CHAIN_APPROX_SIMPLE
+  );
 
   const spots = [];
 
-  for (let i = 0; i < keypoints.size(); i++) {
-    const kp = keypoints.get(i);
+  for (let i = 0; i < contours.size(); i++) {
+    let cnt = contours.get(i);
+
+    let area = cv.contourArea(cnt);
+
+    // filter noise
+    if (area < 20) continue;
+
+    let moments = cv.moments(cnt);
+    if (moments.m00 === 0) continue;
+
+    let cx = moments.m10 / moments.m00;
+    let cy = moments.m01 / moments.m00;
 
     spots.push({
       id: i,
-      x: kp.pt.x,
-      y: kp.pt.y,
-      area: Math.PI * Math.pow(kp.size / 2, 2)
+      x: cx,
+      y: cy,
+      area: area
     });
   }
 
@@ -386,7 +389,8 @@ function detectBlobsOpenCV(imageCanvas, polygonMask) {
   gray.delete();
   blurred.delete();
   thresh.delete();
-  keypoints.delete();
+  contours.delete();
+  hierarchy.delete();
 
   return spots;
 }
