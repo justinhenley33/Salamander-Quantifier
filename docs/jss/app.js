@@ -11,6 +11,7 @@ import { exportJson, exportMask, exportColorCsv, exportColorBinnedCsv } from "./
 import { runColorAnalysis } from "./color.js";
 import { setStatus, enableTools } from "./utils.js";
 import { initBottomDrawer, resetOverviewPreview } from "./drawer.js";
+import { runPatternAnalysis, exportPatternCSV } from "./pattern.js";
 
 export function initApp() {
   state.canvas = document.getElementById("canvas");
@@ -31,12 +32,19 @@ export function initApp() {
   const exportMenuToggle = document.getElementById("exportMenuToggle");
   const exportPopover = document.getElementById("exportPopover");
 
+  state.runPatternBtn = document.getElementById("runPatternBtn");
+  state.exportPatternCsvBtn = document.getElementById("exportPatternCsvBtn");
+  state.exportPatternOverlayBtn = document.getElementById("exportPatternOverlayBtn");
+
   state.fileInput.addEventListener("change", handleFileChange);
   state.canvas.addEventListener("click", addPointFromEvent);
   state.canvas.addEventListener("dblclick", closePolygon);
   state.undoBtn.addEventListener("click", undoPoint);
   state.clearBtn.addEventListener("click", clearPolygon);
   state.showOverlay.addEventListener("change", draw);
+  state.overlayCanvas = document.createElement("canvas");
+  state.overlayCanvas.width = state.canvas.width;
+  state.overlayCanvas.height = state.canvas.height;
 
   state.exportJsonBtn.addEventListener("click", exportJson);
   state.exportMaskBtn.addEventListener("click", exportMask);
@@ -67,7 +75,52 @@ export function initApp() {
 
   window.addEventListener("resize", () => {
     resizeCanvasToWrapper();
+
+    state.overlayCanvas.width = state.canvas.width;
+    state.overlayCanvas.height = state.canvas.height;
+
     draw();
+  });
+
+  state.runPatternBtn.addEventListener("click", () => {
+    const result = runPatternAnalysis({
+      imageCanvas: state.canvas,
+      overlayCanvas: state.overlayCanvas
+    });
+
+    state.patternResults = result.spots;
+
+    setStatus("Pattern analysis complete.");
+
+    state.exportPatternCsvBtn.disabled = false;
+    state.exportPatternOverlayBtn.disabled = false;
+  });
+
+  state.exportPatternCsvBtn.addEventListener("click", () => {
+    if (!state.patternResults) return;
+
+    const csv = exportPatternCSV(state.patternResults);
+
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "pattern_analysis.csv";
+    a.click();
+
+    URL.revokeObjectURL(url);
+  });
+
+  state.exportPatternOverlayBtn.addEventListener("click", () => {
+    if (!state.overlayCanvas) return;
+
+    const url = state.overlayCanvas.toDataURL("image/png");
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "pattern_overlay.png";
+    a.click();
   });
 
   initBottomDrawer();

@@ -28,6 +28,9 @@ export const state = {
 
   colorAnalysisMode: false,
   colorAnalysisComplete: false,
+
+  patternResults: null,
+  overlayCanvas: null,
   
   colorHexCounts: [],
   totalPixelsInSelection: 0,

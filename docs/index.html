@@ -52,7 +52,7 @@
       <div class="block">
         <h3>Pattern Analysis</h3>
         <div class="hint">
-          Analyze visual pattern structure inside the selected region.
+          Detect and analyze clustering of spots in the selected region.
         </div>
         <button id="patternAnalysisBtn" class="btn2" disabled>
           Pattern Analysis
@@ -72,11 +72,21 @@
 
     <div id="exportPopover" class="exportPopover hidden">
       <div class="exportPopoverTitle">Export</div>
+
       <button id="exportJsonBtn" class="btn2" disabled>Polygon JSON</button>
       <button id="exportMaskBtn" class="btn2" disabled>Mask PNG</button>
       <button id="exportColorCsvBtn" class="btn2" disabled>Export Color CSV</button>
       <button id="exportColorBinnedBtn" class="btn2" disabled>
         Export Binned (32)
+      </button>
+
+      <div class="exportDivider"></div>
+      <div class="exportSubTitle">Pattern Analysis</div>
+      <button id="exportPatternCsvBtn" class="btn2" disabled>
+        Export Pattern CSV
+      </button>
+      <button id="exportPatternOverlayBtn" class="btn2" disabled>
+        Export Pattern Overlay
       </button>
     </div>
 
