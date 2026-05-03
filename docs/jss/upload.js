@@ -38,10 +38,8 @@ export function handleFileChange(e) {
       state.overlayCanvas.height = state.canvas.height;
     }
 
-    // 🔴 Draw image
     draw();
 
-    // 🔴 Force redraw next frame (prevents blank canvas bug)
     requestAnimationFrame(() => {
       draw();
     });
