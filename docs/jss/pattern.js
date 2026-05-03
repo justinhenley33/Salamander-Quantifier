@@ -379,8 +379,6 @@ function regionQuery(points, p, eps) {
 function drawOverlay(canvas, spots, width, height, polygon) {
   const ctx = canvas.getContext("2d");
   ctx.clearRect(0, 0, width, height);
-  ctx.fillStyle = "red";
-  ctx.arc(s.x, s.y, 6, 0, Math.PI * 2);
 
   // polygon outline
   if (polygon && polygon.length > 2) {
