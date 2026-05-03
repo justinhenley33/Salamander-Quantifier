@@ -338,7 +338,7 @@ function detectBlobsOpenCV(imageCanvas, polygonMask) {
 
   // threshold (manual)
   let thresh = new cv.Mat();
-  cv.threshold(blurred, thresh, 180, 255, cv.THRESH_BINARY);
+  cv.threshold(blurred, thresh, 150, 255, cv.THRESH_BINARY);
 
   // DEBUG
   const debugCanvas = document.getElementById("debugCanvas");
