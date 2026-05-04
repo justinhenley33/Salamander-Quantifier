@@ -14,6 +14,25 @@ function getDrawerElements() {
   };
 }
 
+function getHsvRangeLabel(generalColor) {
+  const ranges = {
+    White: "V ≥ 0.94 and S ≤ 0.08",
+    Black: "V ≤ 0.18",
+    Gray: "S ≤ 0.15",
+    Brown: "H 15°–45° and V < 0.65",
+    Red: "H 345°–360° or 0°–15°",
+    Orange: "H 15°–45°",
+    Yellow: "H 45°–70°",
+    Green: "H 70°–170°",
+    Cyan: "H 170°–200°",
+    Blue: "H 200°–255°",
+    Purple: "H 255°–320°",
+    Pink: "H 320°–345°"
+  };
+
+  return ranges[generalColor] || "Unclassified";
+}
+
 export function initBottomDrawer() {
   const { drawer, content, handle } = getDrawerElements();
   if (!drawer || !content || !handle) return;
@@ -78,7 +97,6 @@ export function initBottomDrawer() {
   window.addEventListener("pointerup", onPointerUp);
 }
 
-// comment
 export function renderOverviewPreview() {
   const { tbody, summary } = getDrawerElements();
   if (!tbody || !summary) return;
@@ -100,7 +118,7 @@ export function renderOverviewPreview() {
       (row) => `
         <tr>
           <td>${row.generalColor}</td>
-          <td>${row.hexRange}</td>
+          <td>${getHsvRangeLabel(row.generalColor)}</td>
           <td>${row.pixelCount}</td>
           <td>${formatPercent(row.percentage)}%</td>
         </tr>
