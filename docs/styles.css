@@ -195,17 +195,16 @@ canvas{
   right: 0;
   bottom: 0;
   z-index: 15;
-  pointer-events: none;
-  max-height: min(45dvh, 360px);
+  height: min(45dvh, 360px);
+  pointer-events: auto;
 }
 
 .bottomDrawerContent {
   pointer-events: auto;
   position: relative;
   width: 100%;
-  height: calc(100vh - 56px);
-  max-height: calc(100vh - 56px);
-  min-height: 300px;
+  height: 100%;
+  min-height: 0;
   background: rgba(20, 24, 32, 0.94);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -223,12 +222,13 @@ canvas{
 }
 
 .bottomDrawerHandle {
+  height: 56px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 10px 16px 12px;
+  padding: 8px 16px;
   cursor: grab;
   user-select: none;
   background: rgba(20, 24, 32, 0.98);
@@ -256,7 +256,7 @@ canvas{
   flex-direction: column;
   padding: 0 18px 18px;
   color: white;
-  height: calc(100% - 64px);
+  height: calc(100% - 56px);
   overflow: hidden;
 }
 

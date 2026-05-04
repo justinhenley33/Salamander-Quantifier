@@ -44,7 +44,6 @@ export function addPointFromEvent(evt) {
   updatePointButtons();
   draw();
 }
-
 export function closePolygon() {
   if (!state.img) return;
 
@@ -54,7 +53,12 @@ export function closePolygon() {
   }
 
   state.polygonClosed = true;
-  setStatus("Polygon closed. You can export JSON, a binary mask PNG, or run color analysis.");
+
+  if (state.colorAnalysisBtn) {
+    state.colorAnalysisBtn.disabled = false;
+  }
+
+  setStatus("Polygon closed. You can now run color analysis.");
   draw();
 }
 
@@ -63,6 +67,18 @@ export function undoPoint() {
 
   if (state.polygonClosed) {
     state.polygonClosed = false;
+
+    if (state.colorAnalysisBtn) {
+      state.colorAnalysisBtn.disabled = true;
+    }
+
+    if (state.exportColorCsvBtn) {
+      state.exportColorCsvBtn.disabled = true;
+    }
+
+    if (state.exportColorBinnedBtn) {
+      state.exportColorBinnedBtn.disabled = true;
+    }
   }
 
   state.points.pop();
@@ -74,13 +90,41 @@ export function undoPoint() {
 export function clearPolygon() {
   state.points = [];
   state.polygonClosed = false;
+
+  if (state.colorAnalysisBtn) {
+    state.colorAnalysisBtn.disabled = true;
+  }
+
+  if (state.exportColorCsvBtn) {
+    state.exportColorCsvBtn.disabled = true;
+  }
+
+  if (state.exportColorBinnedBtn) {
+    state.exportColorBinnedBtn.disabled = true;
+  }
+
   setStatus("Cleared polygon.");
   updatePointButtons();
   draw();
 }
 
-export function resetPolygon() {
-  state.points = [];
-  state.polygonClosed = false;
-  updatePointButtons();
+function resetColorAnalysisState() {
+  state.colorAnalysisMode = false;
+  state.colorAnalysisComplete = false;
+  state.colorAnalysisResults = [];
+  state.colorAnalysisSummary = null;
+
+  if (!state.polygonClosed && state.colorAnalysisBtn) {
+    state.colorAnalysisBtn.disabled = true;
+  }
+
+  if (state.exportColorCsvBtn) {
+    state.exportColorCsvBtn.disabled = true;
+  }
+
+  if (state.exportColorBinnedBtn) {
+    state.exportColorBinnedBtn.disabled = true;
+  }
+
+  resetOverviewPreview();
 }
