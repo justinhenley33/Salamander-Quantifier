@@ -19,17 +19,20 @@ export function initApp() {
   state.fileInput = document.getElementById("fileInput");
   state.fileName = document.getElementById("fileName");
   state.statusEl = document.getElementById("status");
+  state.binSizeSelect = document.getElementById("binSizeSelect");
 
   state.undoBtn = document.getElementById("undoBtn");
   state.clearBtn = document.getElementById("clearBtn");
-  state.exportJsonBtn = document.getElementById("exportJsonBtn");
-  state.exportMaskBtn = document.getElementById("exportMaskBtn");
   state.colorAnalysisBtn = document.getElementById("colorAnalysisBtn");
   state.exportColorCsvBtn = document.getElementById("exportColorCsvBtn");
   state.showOverlay = document.getElementById("showOverlay");
 
   const exportMenuToggle = document.getElementById("exportMenuToggle");
   const exportPopover = document.getElementById("exportPopover");
+
+  const helpBtn = document.getElementById("helpBtn");
+  const helpModal = document.getElementById("helpModal");
+  const closeHelpBtn = document.getElementById("closeHelpBtn");
 
   state.fileInput.addEventListener("change", handleFileChange);
   state.canvas.addEventListener("click", addPointFromEvent);
@@ -38,8 +41,6 @@ export function initApp() {
   state.clearBtn.addEventListener("click", clearPolygon);
   state.showOverlay.addEventListener("change", draw);
 
-  state.exportJsonBtn.addEventListener("click", exportJson);
-  state.exportMaskBtn.addEventListener("click", exportMask);
   state.exportColorCsvBtn.addEventListener("click", exportColorCsv);
   state.colorAnalysisBtn.addEventListener("click", runColorAnalysis);
   state.exportColorBinnedBtn = document.getElementById("exportColorBinnedBtn");
@@ -69,6 +70,28 @@ export function initApp() {
     resizeCanvasToWrapper();
     draw();
   });
+
+
+  if (helpBtn && helpModal) {
+    helpBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      helpModal.classList.remove("hidden");
+    });
+  }
+
+  if (closeHelpBtn && helpModal) {
+    closeHelpBtn.addEventListener("click", () => {
+      helpModal.classList.add("hidden");
+    });
+  }
+
+  if (helpModal) {
+    helpModal.addEventListener("click", (e) => {
+      if (e.target === helpModal) {
+        helpModal.classList.add("hidden");
+      }
+    });
+  }
 
   initBottomDrawer();
   resetOverviewPreview();

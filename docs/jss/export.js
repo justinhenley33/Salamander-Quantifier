@@ -1,56 +1,5 @@
 import { state } from "./state.js";
-import { downloadDataUrl, downloadTextFile, setStatus } from "./utils.js";
-
-export function exportJson() {
-  if (!state.img) return;
-
-  const payload = {
-    image: {
-      width: state.img.width,
-      height: state.img.height
-    },
-    polygonClosed: state.polygonClosed,
-    points: state.points.map((p) => ({
-      x: p.x / state.img.width,
-      y: p.y / state.img.height
-    }))
-  };
-
-  downloadTextFile("segmentation.json", JSON.stringify(payload, null, 2));
-}
-
-export function exportMask() {
-  if (!state.img) return;
-
-  if (!state.polygonClosed || state.points.length < 3) {
-    setStatus("Close the polygon first (double-click).");
-    return;
-  }
-
-  const off = document.createElement("canvas");
-  off.width = state.img.width;
-  off.height = state.img.height;
-  const octx = off.getContext("2d");
-
-  octx.fillStyle = "black";
-  octx.fillRect(0, 0, off.width, off.height);
-
-  octx.beginPath();
-  octx.moveTo(state.points[0].x, state.points[0].y);
-
-  for (let i = 1; i < state.points.length; i++) {
-    octx.lineTo(state.points[i].x, state.points[i].y);
-  }
-
-  octx.closePath();
-  octx.fillStyle = "white";
-  octx.fill();
-
-  const dataUrl = off.toDataURL("image/png");
-  downloadDataUrl("mask.png", dataUrl);
-
-  setStatus("Exported mask.png (white region = selection).");
-}
+import { downloadTextFile, setStatus } from "./utils.js";
 
 function getSafeImageFilename() {
   return (
@@ -74,6 +23,56 @@ function csvEscape(value) {
 
 function formatPercent(p) {
   return (p * 100).toFixed(4);
+}
+
+function clampChannelToBin(value, binSize) {
+  return Math.floor(value / binSize) * binSize;
+}
+
+function rgbToHex(r, g, b) {
+  return (
+    "#" +
+    [r, g, b]
+      .map((v) => v.toString(16).padStart(2, "0"))
+      .join("")
+      .toUpperCase()
+  );
+}
+
+function hexToRgb(hex) {
+  const clean = hex.replace("#", "");
+  if (clean.length !== 6) return null;
+
+  return {
+    r: parseInt(clean.slice(0, 2), 16),
+    g: parseInt(clean.slice(2, 4), 16),
+    b: parseInt(clean.slice(4, 6), 16)
+  };
+}
+
+function buildBinnedCountsFromHexCounts(hexCounts, binSize) {
+  const binnedMap = new Map();
+
+  for (const row of hexCounts) {
+    const rgb = hexToRgb(row.hexValue);
+    if (!rgb) continue;
+
+    const br = clampChannelToBin(rgb.r, binSize);
+    const bg = clampChannelToBin(rgb.g, binSize);
+    const bb = clampChannelToBin(rgb.b, binSize);
+
+    const binnedHex = rgbToHex(br, bg, bb);
+
+    const current = binnedMap.get(binnedHex) || 0;
+    binnedMap.set(binnedHex, current + row.pixelCount);
+  }
+
+  return Array.from(binnedMap.entries())
+    .map(([hexValue, pixelCount]) => ({
+      hexValue,
+      pixelCount
+    }))
+    .sort((a, b) => b.pixelCount - a.pixelCount);
 }
 
 export function exportColorCsv() {
@@ -131,32 +130,43 @@ export function exportColorCsv() {
 }
 
 export function exportColorBinnedCsv() {
-  if (!state.colorAnalysisComplete || state.colorBinnedCounts.length === 0) {
+  if (!state.colorAnalysisComplete || state.colorHexCounts.length === 0) {
     setStatus("Run color analysis before exporting binned CSV.");
     return;
   }
 
-  const imageName =
-    state.imageFilename ||
-    state.fileInput?.files?.[0]?.name ||
-    "uploaded_image";
+  const baseName = getBaseImageName();
 
-  const baseName = imageName.replace(/\.[^.]+$/, "");
+  const selectedBinSize = state.binSizeSelect
+    ? Number(state.binSizeSelect.value)
+    : 32;
+
+  const validBinSizes = [8, 16, 32, 64];
+  const binSize = validBinSizes.includes(selectedBinSize)
+    ? selectedBinSize
+    : 32;
+
+  const binnedCounts = buildBinnedCountsFromHexCounts(
+    state.colorHexCounts,
+    binSize
+  );
 
   const lines = [];
   lines.push("binned_hex_value,pixel_count");
 
-  for (const row of state.colorBinnedCounts) {
-    lines.push(`${row.hexValue},${row.pixelCount}`);
+  for (const row of binnedCounts) {
+    lines.push(
+      [row.hexValue, row.pixelCount].map(csvEscape).join(",")
+    );
   }
 
   const csv = lines.join("\n");
 
   downloadTextFile(
-    `${baseName}_color_binned_32.csv`,
+    `${baseName}_color_binned_${binSize}.csv`,
     csv,
     "text/csv"
   );
 
-  setStatus("Exported binned color CSV (size 32).");
+  setStatus(`Exported binned color CSV (size ${binSize}).`);
 }

@@ -17,7 +17,7 @@
         <input id="fileInput" type="file" accept="image/*" hidden />
       </label>
       <a href="#" id="exportMenuToggle" class="navlink">Export</a>
-      <a href="#" class="navlink">Help</a>
+      <a href="#" id="helpBtn" class="navlink">Help</a>
 
     </nav>
   </header>
@@ -74,11 +74,18 @@
 
     <div id="exportPopover" class="exportPopover hidden">
       <div class="exportPopoverTitle">Export</div>
-      <button id="exportJsonBtn" class="btn2" disabled>Polygon JSON</button>
-      <button id="exportMaskBtn" class="btn2" disabled>Mask PNG</button>
       <button id="exportColorCsvBtn" class="btn2" disabled>Export Color CSV</button>
+      <label class="exportLabel" for="binSizeSelect">Bin Size</label>
+
+      <select id="binSizeSelect" class="select2">
+        <option value="8">8</option>
+        <option value="16">16</option>
+        <option value="32" selected>32</option>
+        <option value="64">64</option>
+      </select>
+
       <button id="exportColorBinnedBtn" class="btn2" disabled>
-        Export Binned (32)
+        Export Binned CSV
       </button>
     </div>
 
@@ -116,6 +123,38 @@
             </table>
           </div>
         </div>
+      </div>
+    </div>
+
+    <div id="helpModal" class="modal hidden">
+      <div class="modalContent">
+        <button id="closeHelpBtn" class="modalClose">×</button>
+
+        <h2>How to Use Salamander Quantifier</h2>
+
+        <h3>1. Upload an image</h3>
+        <p>
+          Click Upload in the top bar and choose a salamander image from your computer.
+        </p>
+
+        <h3>2. Segment a region</h3>
+        <p>
+          Click points around the salamander region you want to analyze. Double click to close the polygon.
+          Try to select only the region of interest and avoid background areas.
+        </p>
+
+        <h3>3. Run color analysis</h3>
+        <p>
+          After the polygon is closed, click Color Analysis. The site will analyze only the pixels inside
+          the selected region.
+        </p>
+
+        <h3>4. Export results</h3>
+        <p>
+          Use the Export menu to download either the detailed color CSV or the binned color CSV.
+          The detailed CSV contains more precise pixel level color data, while the binned CSV groups
+          similar colors together.
+        </p>
       </div>
     </div>
   </section>
