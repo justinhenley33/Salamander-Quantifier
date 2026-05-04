@@ -19,8 +19,6 @@ export function enableTools(enabled) {
     state.clearBtn.disabled = !enabled || state.points.length === 0;
   }
 
-  // Important:
-  // Color Analysis should only unlock in closePolygon(), not on upload.
   if (state.colorAnalysisBtn) {
     state.colorAnalysisBtn.disabled = true;
   }
