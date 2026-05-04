@@ -7,7 +7,7 @@ import {
   undoPoint,
   clearPolygon
 } from "./segmentation.js";
-import { exportJson, exportMask, exportColorCsv, exportColorBinnedCsv } from "./export.js";
+import { exportColorCsv, exportColorBinnedCsv } from "./export.js";
 import { runColorAnalysis } from "./color.js";
 import { setStatus, enableTools } from "./utils.js";
 import { initBottomDrawer, resetOverviewPreview } from "./drawer.js";
