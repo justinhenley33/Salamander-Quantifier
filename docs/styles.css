@@ -15,8 +15,7 @@ html, body{
   background: var(--navy);
   color: var(--text);
 
-  height: 100%;
-  min-height: 100dvh;
+  height: 100vh;
   overflow: hidden;
 }
 
@@ -41,8 +40,7 @@ html, body{
 .layout{
   display:grid;
   grid-template-columns: 280px 1fr;
-  height: calc(100dvh - 56px);
-  min-height: 0;
+  height: calc(100vh - 56px);
   overflow: hidden;
 }
 
@@ -50,9 +48,6 @@ html, body{
   padding:16px;
   border-right: 1px solid var(--border);
   background: rgba(0,0,0,0.12);
-  min-height: 0;
-  overflow-y: auto;
-  padding-bottom: 24px;
 }
 .sidebar h2{
   margin:4px 0 14px;
@@ -130,7 +125,6 @@ html, body{
   overflow: hidden;
   position: relative;
   height: 100%;
-  min-height: 0;
 }
 
 .canvasWrap{
@@ -195,16 +189,16 @@ canvas{
   right: 0;
   bottom: 0;
   z-index: 15;
-  height: min(45dvh, 360px);
-  pointer-events: auto;
+  pointer-events: none;
 }
 
 .bottomDrawerContent {
   pointer-events: auto;
   position: relative;
   width: 100%;
-  height: 100%;
-  min-height: 0;
+  height: calc(100vh - 56px);
+  max-height: calc(100vh - 56px);
+  min-height: 300px;
   background: rgba(20, 24, 32, 0.94);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -222,13 +216,12 @@ canvas{
 }
 
 .bottomDrawerHandle {
-  height: 56px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 8px 16px;
+  padding: 10px 16px 12px;
   cursor: grab;
   user-select: none;
   background: rgba(20, 24, 32, 0.98);
@@ -256,7 +249,7 @@ canvas{
   flex-direction: column;
   padding: 0 18px 18px;
   color: white;
-  height: calc(100% - 56px);
+  height: calc(100% - 64px);
   overflow: hidden;
 }
 
@@ -312,7 +305,7 @@ canvas{
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
 }
 
 .modalContent h2 {
