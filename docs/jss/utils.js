@@ -19,19 +19,10 @@ export function enableTools(enabled) {
     state.clearBtn.disabled = !enabled;
   }
 
-  /*
-    Keep color analysis disabled until the polygon is closed.
-    This prevents users from running analysis before selecting a region.
-    closePolygon() should enable it.
-  */
   if (state.colorAnalysisBtn) {
     state.colorAnalysisBtn.disabled = true;
   }
 
-  /*
-    Export buttons should stay disabled until color analysis is complete.
-    runColorAnalysis() should enable them after successful analysis.
-  */
   if (state.exportColorCsvBtn) {
     state.exportColorCsvBtn.disabled = true;
   }
