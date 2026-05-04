@@ -8,8 +8,6 @@ export const state = {
 
   undoBtn: null,
   clearBtn: null,
-  exportJsonBtn: null,
-  exportMaskBtn: null,
   exportColorCsvBtn: null,
   colorAnalysisBtn: null,
   showOverlay: null,

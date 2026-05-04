@@ -5,17 +5,41 @@ export function clamp(v, lo, hi) {
 }
 
 export function setStatus(msg) {
-  state.statusEl.textContent = msg;
+  if (state.statusEl) {
+    state.statusEl.textContent = msg;
+  }
 }
 
 export function enableTools(enabled) {
-  state.undoBtn.disabled = !enabled;
-  state.clearBtn.disabled = !enabled;
-  state.exportJsonBtn.disabled = !enabled;
-  state.exportMaskBtn.disabled = !enabled;
-  state.colorAnalysisBtn.disabled = !enabled;
-}
+  if (state.undoBtn) {
+    state.undoBtn.disabled = !enabled;
+  }
 
+  if (state.clearBtn) {
+    state.clearBtn.disabled = !enabled;
+  }
+
+  /*
+    Keep color analysis disabled until the polygon is closed.
+    This prevents users from running analysis before selecting a region.
+    closePolygon() should enable it.
+  */
+  if (state.colorAnalysisBtn) {
+    state.colorAnalysisBtn.disabled = true;
+  }
+
+  /*
+    Export buttons should stay disabled until color analysis is complete.
+    runColorAnalysis() should enable them after successful analysis.
+  */
+  if (state.exportColorCsvBtn) {
+    state.exportColorCsvBtn.disabled = true;
+  }
+
+  if (state.exportColorBinnedBtn) {
+    state.exportColorBinnedBtn.disabled = true;
+  }
+}
 
 export function downloadDataUrl(filename, url, revoke = false) {
   const a = document.createElement("a");
