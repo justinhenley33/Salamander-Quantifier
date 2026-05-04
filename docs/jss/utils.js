@@ -12,13 +12,15 @@ export function setStatus(msg) {
 
 export function enableTools(enabled) {
   if (state.undoBtn) {
-    state.undoBtn.disabled = !enabled;
+    state.undoBtn.disabled = !enabled || state.points.length === 0;
   }
 
   if (state.clearBtn) {
-    state.clearBtn.disabled = !enabled;
+    state.clearBtn.disabled = !enabled || state.points.length === 0;
   }
 
+  // Important:
+  // Color Analysis should only unlock in closePolygon(), not on upload.
   if (state.colorAnalysisBtn) {
     state.colorAnalysisBtn.disabled = true;
   }

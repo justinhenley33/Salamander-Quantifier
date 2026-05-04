@@ -54,7 +54,12 @@ export function closePolygon() {
   }
 
   state.polygonClosed = true;
-  setStatus("Polygon closed. You can export JSON, a binary mask PNG, or run color analysis.");
+
+  if (state.colorAnalysisBtn) {
+    state.colorAnalysisBtn.disabled = false;
+  }
+
+  setStatus("Polygon closed. You can now run color analysis.");
   draw();
 }
 

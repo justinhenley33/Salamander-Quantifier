@@ -20,6 +20,10 @@ export function handleFileChange(e) {
     state.colorAnalysisComplete = false;
     state.colorAnalysisResults = [];
     state.colorAnalysisSummary = null;
+    state.colorHexCounts = [];
+    state.colorBinnedCounts = [];
+    state.colorOverviewRows = [];
+    state.totalPixelsInSelection = 0;
 
     resizeCanvasToWrapper();
     draw();
@@ -29,7 +33,15 @@ export function handleFileChange(e) {
     if (state.exportColorCsvBtn) {
       state.exportColorCsvBtn.disabled = true;
     }
-    
+
+    if (state.exportColorBinnedBtn) {
+      state.exportColorBinnedBtn.disabled = true;
+    }
+
+    if (state.colorAnalysisBtn) {
+      state.colorAnalysisBtn.disabled = true;
+    }
+
     setStatus("Click to add polygon points. Double-click to close.");
     URL.revokeObjectURL(url);
   };
